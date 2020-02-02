@@ -16,7 +16,7 @@ setup(
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Testing',
-        'License :: TODO', # TODO
+        # 'License :: TODO',
         'Programming Language :: Python :: 3.7',
     ],
     python_requires='>=3.7',
