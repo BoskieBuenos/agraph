@@ -3,13 +3,13 @@ from distutils.core import setup
 setup(
     name = 'agraph',
     packages = ['agraph'],
-    version = '0.0.1',
+    version = '0.0.2',
     license='TODO', # TODO
     description = 'ASCII graph definition utility',
     author = 'boskiebuenos',
     author_email = '', # TODO
     url = 'https://github.com/BoskieBuenos/agraph',
-    download_url = 'https://github.com/BoskieBuenos/agraph/archive/v0.0.1.tar.gz', # TODO
+    download_url = 'https://github.com/BoskieBuenos/agraph/archive/v0.0.2.tar.gz', # TODO
     keywords = [''], # TODO
     install_requires=[],
     classifiers=[
