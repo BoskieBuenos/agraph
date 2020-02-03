@@ -11,6 +11,7 @@ from agraph.point import Point
 
 class AGraphCompiler:
     relation_builders = {}
+    node_builders = {}
 
     def __init__(self, model: AGraphModel = None): # TODO None should not be optional? - Jeśli da się bez modelu to nie powinien być obowiązkowy
         self.model = model or AGraphModel()
@@ -18,6 +19,9 @@ class AGraphCompiler:
 
     def set_representation(self, representation: str) -> None:
         self.representation = representation
+
+    def register_node_builder(self, type, build_node: Callable) -> None:
+        self.node_builders[type.__name__] = build_node
 
     def register_relation_builder(self, type1, type2, build_relation: Callable) -> None:
         # Czy da się odczytać z funkcji typy jej argumentów i typ zwracany
@@ -98,8 +102,6 @@ class AGraphCompiler:
         return nodes # list of connected nodes
 
     def __build_class_registry(self) -> None:
-        # zamodelować class_registry zgodnie z potrzebą
-        # self.__class_registry = []
         self.__class_registry = {}
         for module_id in list(sys.modules):
             try:
@@ -112,9 +114,23 @@ class AGraphCompiler:
                 continue
 
     def __get_node(self, id: str) -> object:
-        # Try from registered
+        # Try from registered nodes
         if id in self.model.nodes:
             return self.model.nodes[id]
+        # Try from registered node builders
+        # sprawdzic czy id zaczyna sie od ktoregos z zarejestrowanych typow
+        type_candidates = sorted(filter(lambda type_with_defined_builder: id.startswith(type_with_defined_builder), list(self.node_builders)), key=len)
+        if type_candidates is not None and len(type_candidates) > 0:
+            top_priority_candidate = type_candidates.pop()
+            if len(top_priority_candidate) < len(id):
+                id_candidate = id[len(top_priority_candidate):]
+                try:
+                    return self.node_builders[top_priority_candidate](id_candidate) # what about id type str/int?
+                except TypeError:
+                    return self.node_builders[top_priority_candidate]()
+            else:
+                return self.node_builders[top_priority_candidate]()
+
         # Try to new object with id -> Próbuje dopasować początek do typu (odcinając po kolei ostatanie znaki?)
         # Może oczekiwać separatora '_' między typem a id ? - zwiększy długość
         type_candidates = sorted(filter(lambda type: id.startswith(type), list(self.__class_registry)), key=len)
@@ -124,12 +140,13 @@ class AGraphCompiler:
             if not bool(ambigious_candidates):
                 if len(top_priority_candidate) < len(id):
                     id_candidate = id[len(top_priority_candidate):]
-                    return self.__class_registry[top_priority_candidate](id=id_candidate) # what about id type str/int?
+                    try:
+                        return self.__class_registry[top_priority_candidate](id_candidate) # what about id type str/int?
+                    except TypeError:
+                        return self.__class_registry[top_priority_candidate]()
                 else:
                     return self.__class_registry[top_priority_candidate]()
         # Try to new object
-        # if id in self.__class_registry:
-        #     return self.__class_registry[id]() # Co jak wymagane są argumenty?
         # TODO rzuć wyjątek, że nie udało się dopasować typu i obiektu LUB zwrócić None (wtedy nie wiadomo, że coś się nie udało)
 
     def __build_relation(self, node1, node2) -> None:

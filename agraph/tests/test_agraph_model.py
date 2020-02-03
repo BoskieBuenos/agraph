@@ -17,6 +17,16 @@ class ModelType2:
     def add_mode_1_instance(self, model_type_1_instance: ModelType1) -> None:
         self.model_type_1_instances.append(model_type_1_instance)
 
+class ModelTypeComplexConstructor:
+    def __init__(self, attributes:dict):
+        self.id:int = attributes['id']
+        self.property:str = attributes['property']
+
+class ModelTypeComplexConstructorAuto:
+    def __init__(self):
+        self.id:int = 1
+        self.property:str = 'auto_property_value'
+
 class Person:
     def __init__(self, id:int):
         self.id = id
@@ -74,6 +84,7 @@ class TestAGraphModel(unittest.TestCase):
 #   - *->* (czy to nie *-* ?)
 # 3. Define a node type with an TYPE_ID (PREFIX)
 # 4. Define a recipe for relation (between generic node instances) -> run recipe to construct node instances and a relation
+# 5. Define type/class object instance construction (handle different constructors parameters and id types) + try to construct default way (but safely)
 
     def test_should_associate_node_id_with_registered_instance(self):
         self.agraph_model = AGraphModel()
@@ -143,6 +154,63 @@ class TestAGraphModel(unittest.TestCase):
         self.assertEqual(len(self.graph), 1)
         self.assertIn(type(self.graph[0][0]), [ModelType1, ModelType2])
         self.assertIn(type(self.graph[0][1]), [ModelType1, ModelType2])
+
+        
+    def test_should_be_able_to_construct_object_from_recipe_on_type_in_node_id_if_recipe_provided(self):
+        self.agraph_model = AGraphModel()
+        self.agraph_compiler = AGraphCompiler(self.agraph_model)
+
+        self.agraph_representation = r'ModelType1-ModelTypeComplexConstructor'
+
+        self.agraph_compiler.register_node_builder(ModelTypeComplexConstructor, lambda: ModelTypeComplexConstructor({'id': 1, 'property': 'value'}))
+        
+        self.agraph_compiler.set_representation(self.agraph_representation)
+        self.graph = self.agraph_compiler.compile()
+
+        self.assertEqual(len(self.graph), 1)
+        self.assertIn(type(self.graph[0][0]), [ModelType1, ModelTypeComplexConstructor])
+        self.assertIn(type(self.graph[0][1]), [ModelType1, ModelTypeComplexConstructor])
+
+
+        complex_object = next(filter(lambda node: isinstance(node, ModelTypeComplexConstructor), self.graph[0]))
+        self.assertEqual(complex_object.property, 'value')
+        
+    def test_should_be_able_to_construct_object_from_recipe_on_type_in_node_id_with_id_suffix(self):
+        self.agraph_model = AGraphModel()
+        self.agraph_compiler = AGraphCompiler(self.agraph_model)
+
+        self.agraph_representation = r'ModelType1-ModelTypeComplexConstructor60'
+
+        self.agraph_compiler.register_node_builder(ModelTypeComplexConstructor, lambda id: ModelTypeComplexConstructor({'id': int(id), 'property': 'value'}))
+        
+        self.agraph_compiler.set_representation(self.agraph_representation)
+        self.graph = self.agraph_compiler.compile()
+
+        self.assertEqual(len(self.graph), 1)
+        self.assertIn(type(self.graph[0][0]), [ModelType1, ModelTypeComplexConstructor])
+        self.assertIn(type(self.graph[0][1]), [ModelType1, ModelTypeComplexConstructor])
+
+        complex_object = next(filter(lambda node: isinstance(node, ModelTypeComplexConstructor), self.graph[0]))
+        self.assertEqual(complex_object.id, 60)
+        self.assertEqual(complex_object.property, 'value')
+
+    def test_should_construct_object_with_recipe_over_auto_detected_class(self): #TODO Consider the desired behavior!
+        self.agraph_model = AGraphModel()
+        self.agraph_compiler = AGraphCompiler(self.agraph_model)
+
+        self.agraph_representation = r'ModelType1-ModelTypeComplexConstructorAuto'
+
+        self.agraph_compiler.register_node_builder(ModelTypeComplexConstructor, lambda id: ModelTypeComplexConstructor({'id': id, 'property': 'value'}))
+        
+        self.agraph_compiler.set_representation(self.agraph_representation)
+        self.graph = self.agraph_compiler.compile()
+
+        self.assertEqual(len(self.graph), 1)
+        self.assertIn(type(self.graph[0][0]), [ModelType1, ModelTypeComplexConstructor])
+        self.assertIn(type(self.graph[0][1]), [ModelType1, ModelTypeComplexConstructor])
+        complex_object = next(filter(lambda node: isinstance(node, ModelTypeComplexConstructor), self.graph[0]))
+        self.assertEqual(complex_object.id, 'Auto')
+        self.assertEqual(complex_object.property, 'value')
 
     def test_should_be_able_to_construct_object_on_type_in_node_id_with_id_suffix(self):
         self.agraph_model = AGraphModel()
