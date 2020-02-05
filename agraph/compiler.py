@@ -4,7 +4,7 @@ from itertools import product
 from functools import reduce
 from typing import List, Callable, Set
 
-from agraph.agraph_model import AGraphModel
+from agraph.model import AGraphModel
 from agraph.edge import Edge, EdgeFactory
 from agraph.point import Point
 
@@ -13,7 +13,7 @@ class AGraphCompiler:
     relation_builders = {}
     node_builders = {}
 
-    def __init__(self, model: AGraphModel = None): # TODO None should not be optional? - Jeśli da się bez modelu to nie powinien być obowiązkowy
+    def __init__(self, model: AGraphModel = None):
         self.model = model or AGraphModel()
         self.__build_class_registry()
 
@@ -24,19 +24,19 @@ class AGraphCompiler:
         self.node_builders[type.__name__] = build_node
 
     def register_relation_builder(self, type1, type2, build_relation: Callable) -> None:
-        # Czy da się odczytać z funkcji typy jej argumentów i typ zwracany
+        # Is it possible to detect build_relation's parameters' types and return type? Lambdas doesn't provide such information.
         # Maybe hash*hash
-        # Co jak builder już zdefiniowany?
+        # What if builder is already registered?
         if type1 not in self.relation_builders:
             self.relation_builders[type1] = {}
         self.relation_builders[type1][type2] = build_relation
+        # TODO The following case requires switching parameters of build_relation function
         # if type2 not in self.relation_builders:
         #     self.relation_builders[type2] = {}
         # self.relation_builders[type2][type1] = build_relation
 
     def compile(self) -> List:
         lines = self.__split_representation_lines(self.representation)
-        # Make matrix of nodes
         matrix = []
         matrix_max_x = max(list(map(lambda line: len(line), lines)))
         matrix_max_y = len(lines)
@@ -67,13 +67,13 @@ class AGraphCompiler:
         for column_index, row_index in product(range(matrix_max_x), range(matrix_max_y)):
             try:
                 if isinstance(matrix[row_index][column_index], Edge):
-                    edges.append(self.resolve_edge(matrix, row_index, column_index))
+                    edges.append(self.__resolve_edge(matrix, row_index, column_index))
             except IndexError:
                 continue
 
         return edges
 
-    def resolve_edge(self, matrix: List[List[str]], edge_row_index: int, edge_column_index: int) -> List[str]:
+    def __resolve_edge(self, matrix: List[List[str]], edge_row_index: int, edge_column_index: int) -> List[str]:
         nodes: List[str] = [None, None]
         # get connected matrix cells coordinates (each eadge character should have its own resolver)
         # cords - coordinates
@@ -118,7 +118,6 @@ class AGraphCompiler:
         if id in self.model.nodes:
             return self.model.nodes[id]
         # Try from registered node builders
-        # sprawdzic czy id zaczyna sie od ktoregos z zarejestrowanych typow
         type_candidates = sorted(filter(lambda type_with_defined_builder: id.startswith(type_with_defined_builder), list(self.node_builders)), key=len)
         if type_candidates is not None and len(type_candidates) > 0:
             top_priority_candidate = type_candidates.pop()
@@ -131,8 +130,8 @@ class AGraphCompiler:
             else:
                 return self.node_builders[top_priority_candidate]()
 
-        # Try to new object with id -> Próbuje dopasować początek do typu (odcinając po kolei ostatanie znaki?)
-        # Może oczekiwać separatora '_' między typem a id ? - zwiększy długość
+        # Try to new object with id -> Try to match the prefix to a type (skipping more and more last characters?)
+        # TODO Is it ok to expect some separator like '_' between type and id? - makes the node id longer
         type_candidates = sorted(filter(lambda type: id.startswith(type), list(self.__class_registry)), key=len)
         if type_candidates is not None and len(type_candidates) > 0:
             top_priority_candidate = type_candidates.pop()
@@ -147,7 +146,7 @@ class AGraphCompiler:
                 else:
                     return self.__class_registry[top_priority_candidate]()
         # Try to new object
-        # TODO rzuć wyjątek, że nie udało się dopasować typu i obiektu LUB zwrócić None (wtedy nie wiadomo, że coś się nie udało)
+        # TODO raise an exception if unable to match type and node OR return None (then it's unknown if something wrong happened)
 
     def __build_relation(self, node1, node2) -> None:
         node1_type = type(node1)

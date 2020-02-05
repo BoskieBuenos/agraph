@@ -1,8 +1,8 @@
 import unittest
 from typing import List
 
-from agraph.agraph_compiler import AGraphCompiler
-from agraph.agraph_model import AGraphModel
+from agraph.compiler import AGraphCompiler
+from agraph.model import AGraphModel
 
 
 class ModelType1:
