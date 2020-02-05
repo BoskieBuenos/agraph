@@ -58,6 +58,18 @@ class Employee:
 
 agraph.set_representation(r'Company-Employee')
 ```
+Warning! Currently, there is a known issue that makes:
+```
+Type  Type
+   \  /
+   Type
+```
+being interpreted as:
+```
+Type      Type
+  \       /
+  Type Type
+```
 #### Nodes' ids
 When a node is represented by a type in graph's representation string, the id of a created node instace can be defined as a suffix of the representation.
 ```
