@@ -1,9 +1,14 @@
 import unittest
+import random
 from typing import List
 
 from agraph.compiler import AGraphCompiler
 from agraph.model import AGraphModel
 
+
+class ModelType:
+    def __init__(self):
+        self.id = random.randint(1, 9999999)
 
 class ModelType1:
     def __init__(self, id:int = 0):
@@ -226,6 +231,24 @@ class TestAGraphModel(unittest.TestCase):
         self.assertIn(type(self.graph[0][1]), [ModelType1, ModelType2])
         self.assertIn(self.graph[0][0].id, [60, 11])
         self.assertIn(self.graph[0][1].id, [60, 11])
+
+    def test_should_identify_multiedge_node_constructed_from_type_in_node(self):
+        self.agraph_model = AGraphModel()
+        self.agraph_compiler = AGraphCompiler(self.agraph_model)
+
+        self.agraph_representation = r'''
+            ModelType-ModelType
+                \       /
+                ModelType
+        '''
+
+        self.agraph_compiler.set_representation(self.agraph_representation)
+        self.graph = self.agraph_compiler.compile()
+
+        ids = set()
+        for edge in self.graph:
+            ids.update([edge[0].id, edge[1].id])
+        self.assertEqual(len(ids), 3)
 
     def test_should_be_able_to_register_model_type(self):
         pass
