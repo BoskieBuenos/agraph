@@ -1,5 +1,5 @@
 # agraph
-The library lets you define your testing model in visibly accessible form - an ASCII graph. For example:
+The ***agraph*** library lets you define your testing model in visibly accessible form - an ASCII graph. For example:
 ```
     Employee   Employee
            \   /
@@ -7,7 +7,7 @@ Employee--Company--Employee
            /   \
     Employee   Employee
 ```
-## Example
+## tl;tr example
 ```python
 class TestCompany(TestCase):
     def setUp(self):
@@ -27,7 +27,7 @@ class TestCompany(TestCase):
         test_model = self.agraph.build()
         self.assertEqual(len(test_model), 6)
 ```
-## ASCII graph
+## ASCII graph representation
 The graph representation consists of nodes and edges. Nodes can be explicitly registered but it is also possible to use type identifier in graph representation string.
 ### Nodes
 #### Explicit nodes registration
@@ -100,7 +100,7 @@ Edges can be build out of multiple characters.
             node2
 
 ```
-Be careful when connecting different characters to build complex edge. The edge bending can be done only with use o `*` character. Therefor, the following is not legal:
+Be careful when connecting different characters to build a complex edge. The edge bending can be done only with the use of `*` character. Therefore, the following is not legal:
 ```
     node1    node1-
          \          \
@@ -116,4 +116,18 @@ Be careful when connecting different characters to build complex edge. The edge 
           |
         node2
 
+```
+The compiler is able to verify if an edge character is connected to a `*` connector. As a result it is possible to build complex edges very close to each other:
+```
+node1    node2
+     \  /
+      **
+      ||
+      |node3
+     node4
+```
+## Instalation
+The library can be installed with pip:
+```
+$ pip install agraph
 ```
