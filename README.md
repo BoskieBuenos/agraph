@@ -28,7 +28,7 @@ class TestCompany(TestCase):
         self.assertEqual(len(test_model), 6)
 ```
 ## ASCII graph representation
-The graph representation consists of nodes and edges. Nodes can be explicitly registered but it is also possible to use type identifier in graph representation string.
+The graph representation consists of nodes and edges. Nodes can be explicitly registered but it is also possible to use a type identifier in graph representation string.
 ### Nodes
 #### Explicit nodes registration
 Use `register_node` method to bind node id with particular object.
@@ -45,7 +45,7 @@ agraph.register_node_builder(Employee, lambda: Employee(id=1, name='John Doe'))
 agraph.set_representation(r'Company-Employee')
 ```
 #### Automatic nodes generation
-When node and type is not registered, the agraph compiler would try to find matching type in program's modules. If match is found, the compiler would try to construct an instance of found type.
+When node and type is not registered, the agraph compiler would try to find the matching type in program's modules. If the match is found, the compiler would try to construct an instance of found type.
 ```python
 class Company:
     def __init__(self):
@@ -64,14 +64,14 @@ Type  Type
    \  /
    Type
 ```
-being interpreted as:
+be interpreted as:
 ```
 Type      Type
   \       /
   Type Type
 ```
 #### Nodes' ids
-When a node is represented by a type in graph's representation string, the id of a created node instace can be defined as a suffix of the representation.
+When a node is represented by a type in graph's representation string, the id of a created node instance can be defined as a suffix of the representation.
 ```
 agraph.register_node_builder(Company, lambda id: Company(id=id))
 agraph.register_node_builder(Employee, lambda id: Employee(id=id, name='John Doe'))
@@ -101,7 +101,7 @@ Warning! The following is not a legal connection.
       \node2
 ```
 #### Multisegment edges
-Edges can be build out of multiple characters.
+Edges can be built out of multiple characters.
 ```
     node1---node2   node1
                       |      node2
@@ -120,7 +120,7 @@ Be careful when connecting different characters to build a complex edge. The edg
         node2
 
 ```
-...and must be done with `*` connectiong different edge characters:
+...and must be done with `*` connecting different edge characters:
 ```
     node1    node1-*
          \          \
