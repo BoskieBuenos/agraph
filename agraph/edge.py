@@ -5,15 +5,13 @@ from agraph.point import Point
 
 
 class Edge:
-    def __init__(self):
-        pass
     @staticmethod
     def applicable(character: str):
         return False
     def connected_cells(self, matrix, edge_row_index, edge_column_index) -> List[Point]:
-        pass
+        raise NotImplementedError()
     def connects(self, edge_row: int, edge_col: int, target_row: int, target_col) -> bool:
-        pass
+        raise NotImplementedError()
 
 class VerticalEdge(Edge):
     @staticmethod

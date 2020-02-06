@@ -5,10 +5,6 @@ from agraph.compiler import AGraphCompiler
 from agraph.model import AGraphModel
 
 
-# TODO Allow custom relation builders (TDD ofc)
-# TODO Definiowanie "mnożonych" relacji (może między typami a nie instancjami)
-
-
 class TestBasicRepresentations(unittest.TestCase):
     def setUp(self):
         self.agraph_model = AGraphModel()
@@ -266,8 +262,6 @@ class TestBrokenGraphs():
         self.agraph_model.register_node('N0', 'node0')
         self.agraph_model.register_node('N1', 'node1')
         self.agraph_compiler = AGraphCompiler(self.agraph_model)
-
-    # TODO ZBĘDNE DO MVP
 
     def tearDown(self):
         self.agraph_compiler.set_representation(self.agraph_representation)

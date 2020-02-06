@@ -63,7 +63,6 @@ class AGraphCompiler:
         # Matrix is constructed
         edges = []
 
-        # Iterate over the matrix - resolve edge if found and erase it from matrix
         for column_index, row_index in product(range(matrix_max_x), range(matrix_max_y)):
             try:
                 if isinstance(matrix[row_index][column_index], Edge):

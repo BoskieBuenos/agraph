@@ -40,56 +40,7 @@ class Organization:
     def __init__(self, id:int):
         self.id = id
 
-# Powinno się definiować sposób konstrukcji powiązania pomiędzy konkretnymi
-# typami np. Person-Organization
-#
-# Powinna być możliwość definicji wielu sposobów tworzenia powiązań dla tej
-# samej pary typów (mogą być powiązane na różne sposoby)
-#
-# Jak taka definicja powinna wyglądać? - Opracować dobre API
-#
-# Identyfikatory na grafie mogą być też nazwami klas:
-#   1. Najpierw sprawdzam czy id jest zarejestrowane
-#   2. Jeśli niezarejestrowane to szukam klas o nazwie z początku (z uwzględnieniem całości)
-#
-# Nody na grafie nie powinny musieć mieć id
-#
-
-
-# Nie powinno się bezpośrenio wykorzystywać kompilatora tylko budować obiekt klasy AGraph:
-# agraph = AGraph()
-# agraph.add_node('id', object)
-# agraph.add_relation_builder_func(Person, Organization, lambda n1, n2: expr) // nazwa jest z dupy
-# agraph.add_relation_builder_func(person1, org2, lambda n1, n2: expr) // custom func dla konkretnej pary
-# How to create Orgaznization-Person relation? (podaję przepisa na stworzenie/zareprezentowanie relacji)
-
-# How to create Person-Person relation?
-
-
-# self.agraph_representation = r'''
-#   N0
-#     \ N1--N2    N9
-#      N3--N4 \  /
-#     /  \ N5--N6--N10
-#   N7    N8  /  \
-#            N11 N12
-# '''
-
-
 class TestAGraphModel(unittest.TestCase):
-# TODO
-# 1. Define a node instance with an ID
-# 2. Define a recipe for relation (between node instances) -> run recipe to construct a relation
-#   - 1-1
-#   - 1->1
-#   - 1-*  
-#   - 1->*  
-#   - 1<-*
-#   - *-*
-#   - *->* (czy to nie *-* ?)
-# 3. Define a node type with an TYPE_ID (PREFIX)
-# 4. Define a recipe for relation (between generic node instances) -> run recipe to construct node instances and a relation
-# 5. Define type/class object instance construction (handle different constructors parameters and id types) + try to construct default way (but safely)
 
     def test_should_associate_node_id_with_registered_instance(self):
         self.agraph_model = AGraphModel()
@@ -146,7 +97,6 @@ class TestAGraphModel(unittest.TestCase):
         self.assertEqual(len(list_node), 2)
         self.assertEqual(list_node[0] + list_node[1], 'this_node_is_beautiful')
 
-    # 3. Define a node type with an TYPE_ID (PREFIX)
     def test_should_be_able_to_construct_object_on_type_in_node_id_if_id_not_registered(self):
         self.agraph_model = AGraphModel()
         self.agraph_compiler = AGraphCompiler(self.agraph_model)
@@ -221,7 +171,7 @@ class TestAGraphModel(unittest.TestCase):
         self.agraph_model = AGraphModel()
         self.agraph_compiler = AGraphCompiler(self.agraph_model)
 
-        self.agraph_representation = r'ModelType260-ModelType111' # Type2 obj(id: 60) - Type1 obj(id: 11)
+        self.agraph_representation = r'ModelType260-ModelType111'
 
         self.agraph_compiler.set_representation(self.agraph_representation)
         self.graph = self.agraph_compiler.compile()
