@@ -147,6 +147,8 @@ class AGraphCompiler:
         # Try to new object
         # TODO raise an exception if unable to match type and node OR return None (then it's unknown if something wrong happened)
 
+    # TODO The "reverse type recipe match" should be done when the direction of relation doesn't matter (not directed edge)
+    # TODO The "recipe matching" should raise error if recipe depend on direction but edge is declared not directional
     def __build_relation(self, node1, node2) -> None:
         node1_type = type(node1)
         node2_type = type(node2)

@@ -56,7 +56,7 @@ class TestAGraphModel(unittest.TestCase):
 
         self.assertTrue(node_instance in self.graph[0])
 
-    def test_should_use_recipe_for_relation_build(self):
+    def test_should_use_recipe_for_relation_build_on_notdirectional_edge(self):
         self.agraph_model = AGraphModel()
         self.agraph_compiler = AGraphCompiler(self.agraph_model)
 
@@ -75,7 +75,7 @@ class TestAGraphModel(unittest.TestCase):
         self.assertTrue(node_1 in self.graph[0] and node_2 in self.graph[0])
         self.assertTrue(node_1 in node_2.model_type_1_instances)
 
-    def test_should_use_correct_recipe_for_relation_build(self):
+    def test_should_use_type_correct_recipe_for_relation_build(self):
         self.agraph_model = AGraphModel()
         self.agraph_compiler = AGraphCompiler(self.agraph_model)
 
@@ -96,6 +96,35 @@ class TestAGraphModel(unittest.TestCase):
 
         self.assertEqual(len(list_node), 2)
         self.assertEqual(list_node[0] + list_node[1], 'this_node_is_beautiful')
+
+    def test_should_use_reversed_recipe_for_relation_build_if_singledirection_recipe_provided_on_notdirectional_edge(self):
+        self.agraph_model = AGraphModel()
+        self.agraph_compiler = AGraphCompiler(self.agraph_model)
+
+        node_1 = ModelType1(1)
+        node_2 = ModelType2(1)
+        self.agraph_model.register_node('N1', node_1)
+        self.agraph_model.register_node('N2', node_2)
+        self.agraph_compiler.register_relation_builder(ModelType1, ModelType2, lambda model_type_1_instance, model_type_2_instance: model_type_2_instance.add_mode_1_instance(model_type_1_instance))
+
+        self.agraph_representation = r'N1-N2'
+        self.agraph_compiler.set_representation(self.agraph_representation)
+        self.graph = self.agraph_compiler.compile()
+        self.assertTrue(node_1 in self.graph[0] and node_2 in self.graph[0])
+        self.assertTrue(node_1 in node_2.model_type_1_instances)
+        
+        self.reversed_agraph_model = AGraphModel()
+        self.reversed_agraph_compiler = AGraphCompiler(self.reversed_agraph_model)
+
+        self.reversed_agraph_model.register_node('N1', node_1)
+        self.reversed_agraph_model.register_node('N2', node_2)
+        self.reversed_agraph_compiler.register_relation_builder(ModelType1, ModelType2, lambda model_type_1_instance, model_type_2_instance: model_type_2_instance.add_mode_1_instance(model_type_1_instance))
+
+        self.reversed_agraph_representation = r'N2-N1'
+        self.reversed_agraph_compiler.set_representation(self.reversed_agraph_representation)
+        self.graph = self.reversed_agraph_compiler.compile()
+        self.assertTrue(node_1 in self.graph[0] and node_2 in self.graph[0])
+        self.assertTrue(node_1 in node_2.model_type_1_instances)
 
     def test_should_be_able_to_construct_object_on_type_in_node_id_if_id_not_registered(self):
         self.agraph_model = AGraphModel()
