@@ -138,7 +138,7 @@ node1    node2
       |node3
      node4
 ```
-## Instalation
+## Installation
 The library can be installed with pip:
 ```
 $ pip install agraph

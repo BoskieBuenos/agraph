@@ -6,6 +6,7 @@ from typing import List, Callable, Set
 
 from agraph.model import AGraphModel
 from agraph.edge import Edge, EdgeFactory
+from agraph.node import Node
 from agraph.point import Point
 
 
@@ -49,8 +50,9 @@ class AGraphCompiler:
             for node_id in node_ids:
                 start_index = line.index(node_id, after_end_index)
                 after_end_index = start_index + len(node_id)
+                node = Node(node_id)
                 for occupied_position in range(start_index, after_end_index):
-                    matrix_row[occupied_position] = node_id
+                    matrix_row[occupied_position] = node
 
             # Mark edges on matrix
             for col in range(0, len(line)):
@@ -95,7 +97,7 @@ class AGraphCompiler:
                 # remove edge from matrix
                 matrix[connected_cell.row][connected_cell.col] = None
                 connected_cell = connected_cell_cords
-            nodes[i] = self.__get_node(id=matrix[connected_cell.row][connected_cell.col])
+            nodes[i] = self.__get_node(id=matrix[connected_cell.row][connected_cell.col].id) # TODO Improve handling Node instance
 
         self.__build_relation(nodes[0], nodes[1])
         return nodes # list of connected nodes
